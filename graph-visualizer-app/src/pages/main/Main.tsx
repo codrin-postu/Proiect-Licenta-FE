@@ -1,86 +1,51 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { ForceGraph2D } from "react-force-graph";
-
-const graphData = {
-  nodes: [
-    { id: "Node 1", group: 1 },
-    { id: "Node 2", group: 2 },
-    { id: "Node 3", group: 1 },
-  ],
-  links: [
-    { source: "Node 1", target: "Node 2" },
-    { source: "Node 2", target: "Node 3" },
-    { source: "Node 3", target: "Node 1" },
-  ],
-};
+import "./Main.scss";
+import LandpageGraph from "../../components/landpage_graph/LandpageGraph";
+import { Button } from "@mui/material";
 
 const Main: React.FC = () => {
   return (
-    <div
-      style={{
-        backgroundColor: "#0A2647",
-        color: "#FFFFFF",
-        minHeight: "100vh",
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", padding: "2rem" }}>
-        <div style={{ marginRight: "2rem" }}>
-          <img src="path_to_large_image.jpg" alt="Algorithm Graph Visualizer" />
-        </div>
-        <div>
-          <h1 style={{ fontSize: "2rem" }}>Algorithm Graph Visualizer</h1>
-          <p style={{ fontSize: "1rem" }}>
-            View how search algorithms traverse the states of different problems
-            such as Jealous Husbands, N-Queens, etc.
+    <>
+      <div className="content">
+        <div className="content__inner">
+          <h1 className="content__title">
+            Algorithm Graph <span>Vis</span>ualizer
+          </h1>
+          <p className="content__desc">
+            View how different search algorithms traverse the states of problems
+            such as Jealous Husbands, N-Queens
           </p>
-          <Link to="/choose-problem">
-            <button
-              style={{
-                backgroundColor: "#A77979",
-                color: "#FFFFFF",
-                padding: "0.5rem 1rem",
-                border: "none",
-              }}
-            >
-              Choose Problem
-            </button>
-          </Link>
+
+          <Button
+            className="content__button"
+            variant="contained"
+            href="/viewer"
+          >
+            Begin
+          </Button>
+        </div>
+
+        <div className="content__graph">
+          <LandpageGraph />
         </div>
       </div>
-
-      <div style={{ height: "500px" }}>
-        <ForceGraph2D
-          graphData={{ nodes: graphData.nodes, links: graphData.links }} // Define your graph data here
-          width={800}
-          height={500}
-          nodeAutoColorBy="group"
-          enableNodeDrag={false}
-          enablePanInteraction={false}
-          enableZoomInteraction={false}
-        />
-      </div>
-
-      <footer
-        style={{
-          backgroundColor: "#553939",
-          padding: "1rem",
-          marginTop: "2rem",
-        }}
-      >
-        <div>
-          <a
-            href="https://github.com/repository-link"
-            style={{ color: "#FFFFFF", marginRight: "1rem" }}
-          >
-            GitHub
-          </a>
-          <Link to="/admin/login" style={{ color: "#FFFFFF" }}>
-            Admin Login
-          </Link>
+      <footer className="footer">
+        <div className="footer__content">
+          <p className="footer__text">
+            &copy; <span className="footer__year">2023</span> Bachelor's project
+            by Codrin Postu
+          </p>
+          <div className="footer__links">
+            <a className="footer__link" href="https://github.com/codrin-postu">
+              Github
+            </a>
+            <a className="footer__link" href="/admin/login">
+              Admin
+            </a>
+          </div>
         </div>
       </footer>
-    </div>
+    </>
   );
 };
 

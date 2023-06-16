@@ -1,0 +1,69 @@
+@import "../../resources/utils/_colors.scss";
+
+.right-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 250px;
+  height: 100%;
+  background-color: #fff;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
+  padding: 20px;
+  transform: translateX(100%);
+  transition: transform 0.3s ease-in-out;
+  overflow: hidden;
+}
+
+.right-drawer.open {
+  transform: translateX(0%);
+}
+
+.right-panel {
+  overflow: hidden;
+}
+
+.right-panel__drawer {
+  width: 250px;
+  z-index: 2;
+}
+
+.right-panel__container {
+  height: 100%;
+  background-color: $white-1;
+}
+.right-panel__content {
+  margin: 20px 20px 20px 20px;
+}
+
+.right-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  .right-panel__header-btn {
+    color: $blue-3;
+
+    &:hover {
+      transition: 0.3s;
+      color: $blue-4;
+    }
+  }
+}
+
+.right-panel__open-btn {
+  overflow: hidden;
+  position: absolute;
+  top: 49%;
+  right: -22px;
+  width: 42px;
+  height: auto;
+  color: $blue-3;
+  z-index: 1;
+
+  &:hover {
+    transition: 0.3s;
+    right: -18px;
+    color: $blue-4;
+  }
+}

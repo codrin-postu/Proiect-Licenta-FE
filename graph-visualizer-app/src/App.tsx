@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import logo from "./logo.svg";
+import React from "react";
 import AppRouter from "./AppRouter";
 import "./App.css";
 
