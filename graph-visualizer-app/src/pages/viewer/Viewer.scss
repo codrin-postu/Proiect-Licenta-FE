@@ -1,4 +1,7 @@
+@import "../../resources/utils/_colors.scss";
+
 .viewer-container {
   overflow: hidden;
   width: 100vw;
+  background-color: $white-1;
 }

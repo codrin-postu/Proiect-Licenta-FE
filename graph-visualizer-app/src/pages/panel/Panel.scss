@@ -1,0 +1,19 @@
+@import "../../resources/utils/_colors.scss";
+.panel {
+  margin-left: 200px;
+  padding: 24px;
+  .panel__card {
+    max-width: 95%;
+    margin: 20px auto;
+  }
+  .panel__section {
+    max-width: 95%;
+    // min-height: 80vh;
+    margin: 20px auto;
+    .panel__section__title {
+      font-size: 1.5rem;
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+  }
+}

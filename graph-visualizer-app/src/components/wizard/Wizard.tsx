@@ -18,6 +18,7 @@ import "./Wizard.scss";
 
 interface WizardProps {
   isOpen: boolean;
+  onClose: () => void;
   onProblemDataSelect: (
     problemId: string,
     problemName: string,
@@ -29,7 +30,11 @@ interface WizardProps {
   ) => void;
 }
 
-const Wizard: React.FC<WizardProps> = ({ isOpen, onProblemDataSelect }) => {
+const Wizard: React.FC<WizardProps> = ({
+  isOpen,
+  onClose,
+  onProblemDataSelect,
+}) => {
   const steps = [
     "Choose the problem",
     "Choose the algorithm",
@@ -47,6 +52,16 @@ const Wizard: React.FC<WizardProps> = ({ isOpen, onProblemDataSelect }) => {
     fetchProblems();
     currentStep === 0 && setChosenProblem("");
   }, []);
+
+  useEffect(() => {
+    //Making sure to clear all data when the wizard is closed
+    if (!isOpen) {
+      setCurrentStep(0);
+      setChosenProblem("");
+      setChosenAlgorithm("");
+      setChosenProblemData({});
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (chosenProblem !== "") {
@@ -249,7 +264,7 @@ const Wizard: React.FC<WizardProps> = ({ isOpen, onProblemDataSelect }) => {
   };
 
   return (
-    <Dialog open={isOpen}>
+    <Dialog open={isOpen} onClose={onClose}>
       <Box className="wizard" sx={{ width: "100%" }}>
         <h1 className="wizard__title">Algorithm Graph Visualizer</h1>
         <Stepper activeStep={currentStep} alternativeLabel>

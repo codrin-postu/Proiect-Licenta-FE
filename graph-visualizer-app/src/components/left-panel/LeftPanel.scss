@@ -1,10 +1,10 @@
 @import "../../resources/utils/_colors.scss";
 
-.left-drawer {
+.left-panel__drawer {
   position: fixed;
   top: 0;
   left: 0;
-  width: 250px;
+  width: 350px;
   height: 100%;
   background-color: $white-1;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
@@ -12,38 +12,115 @@
   transition: transform 0.3s ease-in-out;
   overflow: hidden;
   z-index: 2;
-}
 
-.left-drawer.open {
-  transform: translateX(0%);
-}
+  &.open {
+    transform: translateX(0%);
+  }
 
-.left-panel__drawer {
-  width: 250px;
-  z-index: 2;
-}
+  .left-panel__container {
+    height: 100%;
+    background-color: $white-1;
 
-.left-panel__container {
-  height: 100%;
-  background-color: $white-1;
-}
-.left-panel__content {
-  margin: 0 20px 20px 20px;
-}
+    .left-panel__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px 20px 5px 20px;
+      &-btn {
+        color: $blue-3;
 
-.left-panel__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 10px;
-  margin-bottom: 20px;
+        &:hover {
+          transition: 0.3s;
+          color: $blue-4;
+        }
+      }
+    }
 
-  .left-panel__header-btn {
-    color: $blue-3;
+    .left-panel__navigation {
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-    &:hover {
-      transition: 0.3s;
-      color: $blue-4;
+      &-btn {
+        width: 100%;
+      }
+    }
+
+    .left-panel__subtitle {
+      align-self: flex-start;
+      margin: 0 20px 3px 20px;
+    }
+
+    .left-panel__problem {
+      margin: 5px 0;
+
+      &-description {
+        margin: 10px 0px 0px 20px;
+        height: 70vh;
+        overflow-y: auto;
+
+        &__quill {
+          border: none;
+
+          .ql-container {
+            border: none;
+          }
+        }
+      }
+    }
+
+    .left-panel__algorithm {
+      margin: 5px 0;
+
+      &-description {
+        margin: 10px 0px 0px 20px;
+        height: 70vh;
+        overflow-y: auto;
+
+        &__quill {
+          border: none;
+
+          .ql-container {
+            border: none;
+          }
+        }
+      }
+    }
+
+    .left-panel__states-info {
+      margin: 5px 0;
+
+      &-description {
+        margin: 10px 0px 0px 20px;
+
+        .left-panel__color-code {
+          display: flex;
+          align-items: center;
+
+          &-icon {
+            width: 20px;
+            height: 20px;
+            margin: 5px 25px 0 0;
+          }
+        }
+      }
+    }
+
+    .left-panel__selected-data {
+      margin: 5px 0;
+
+      &-description {
+        margin: 10px 20px 0px 20px;
+        div {
+          display: flex;
+        }
+        span {
+          font-weight: bold;
+          width: 140px;
+        }
+      }
     }
   }
 }

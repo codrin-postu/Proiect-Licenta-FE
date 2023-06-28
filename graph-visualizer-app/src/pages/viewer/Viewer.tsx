@@ -44,6 +44,8 @@ const Viewer: React.FC<ViewerProps> = () => {
         setJobSolution(solution);
       };
       fetchSolution();
+      setJobStatus("PENDING");
+      setJobData({});
     }
   }, [jobStatus, jobData.id]);
 
@@ -64,12 +66,14 @@ const Viewer: React.FC<ViewerProps> = () => {
         id: problemId,
         name: problemName,
         description: problemDescription,
+        values: values,
       });
       setSelectedAlgorithm({
         id: algorithmId,
         name: algorithmName,
         description: algorithmDescription,
       });
+      setJobSolution({});
     } catch (error) {
       console.error(error);
     }
@@ -86,6 +90,7 @@ const Viewer: React.FC<ViewerProps> = () => {
   return (
     <div className="viewer-container">
       <LeftPanel
+        isInitialOpen={true}
         onClickNew={handleClickedNew}
         problem={selectedProblem}
         algorithm={selectedAlgorithm}
@@ -94,10 +99,12 @@ const Viewer: React.FC<ViewerProps> = () => {
       />
       <Wizard
         isOpen={isWizardOpen}
+        onClose={() => setIsWizardOpen(false)}
         onProblemDataSelect={handleProblemDataSelect}
       />
       {Object.keys(jobSolution).length !== 0 && (
         <ViewerGraph
+          selectedStateId={selectedStateId}
           steps={jobSolution.steps}
           onStateSelect={handleStateSelect}
           graphData={transformToGraphData(jobSolution.states)}

@@ -2,43 +2,30 @@ import React, { useRef, useEffect, useState } from "react";
 import { withSize, SizeMeProps } from "react-sizeme";
 import { ForceGraph2D } from "react-force-graph";
 import { resetGraphData, updateGraphData } from "../../common/functions";
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-} from "@mui/material";
-import {
-  FaPlay,
-  FaPause,
-  FaStepForward,
-  FaStepBackward,
-  FaRedo,
-  FaCog,
-} from "react-icons/fa";
+
+import TopControl from "../top_controls/TopControl";
+import { STEP_TYPE } from "../../common/constants";
+
+// create an enum with three values: StepForward, StepBackwards and Pause
 
 const withSizeLPG = withSize({ monitorHeight: true, monitorWidth: true });
 
 interface ViewerGraphProps extends SizeMeProps {
   graphData: { nodes: any[]; links: any[] };
   steps: any[];
+  selectedStateId: string;
   onStateSelect: (stateId: string) => void;
 }
 
 const ViewerGraph: React.FC<ViewerGraphProps> = (props) => {
-  const [openSettingsModal, setOpenSettingsModal] = useState(false);
   const [graphData, setGraphData] = useState(props.graphData);
   const [currentStep, setCurrentStep] = useState(0);
+  const [stepType, setStepType] = useState<STEP_TYPE>(STEP_TYPE.Pause);
   const [playing, setPlaying] = useState(false);
   const [playSpeed, setPlaySpeed] = useState(0.25);
   const [colorChoice, setColorChoice] = useState("STATE_TYPE");
 
+  console.log(graphData);
   const graphRef = useRef<any>();
 
   const reset = () => {
@@ -46,16 +33,27 @@ const ViewerGraph: React.FC<ViewerGraphProps> = (props) => {
     setPlaying(false);
     setGraphData((prevData) => resetGraphData(prevData));
   };
-  const play = () => setPlaying(true);
-  const pause = () => setPlaying(false);
-  const next = () =>
+  const play = () => {
+    setPlaying(true);
+    setStepType(STEP_TYPE.StepForward);
+  };
+  const pause = () => {
+    setPlaying(false);
+    setStepType(STEP_TYPE.Pause);
+  };
+  const next = () => {
     currentStep < props.steps.length - 1 && setCurrentStep(currentStep + 1);
-  const previous = () => currentStep > 0 && setCurrentStep(currentStep - 1);
+    setStepType(STEP_TYPE.StepForward);
+  };
+  const previous = () => {
+    currentStep > 0 && setCurrentStep(currentStep - 1);
+    setStepType(STEP_TYPE.StepBackwards);
+  };
 
   useEffect(() => {
     const fg = graphRef.current;
 
-    // I enable force simulation for 5 seconds and I disable it after
+    // I enable force simulation for 3 seconds and I disable it after
     fg.d3Force("link").strength(0.07);
     fg.d3Force("charge").strength(-50);
     setTimeout(() => {
@@ -81,21 +79,21 @@ const ViewerGraph: React.FC<ViewerGraphProps> = (props) => {
   }, [playing, currentStep, props.steps.length, playSpeed]);
 
   useEffect(() => {
-    if (currentStep) {
-      const result = updateGraphData(
-        graphData,
-        props.steps[currentStep],
-        colorChoice
-      );
-      setGraphData(() => result);
-      props.onStateSelect(props.steps[currentStep].state_id);
-    }
+    const result = updateGraphData(
+      graphData,
+      props.steps[
+        stepType === STEP_TYPE.StepForward ? currentStep : currentStep + 1
+      ],
+      stepType,
+      colorChoice
+    );
+    setGraphData(() => result);
+    props.onStateSelect(
+      props.steps[
+        stepType === STEP_TYPE.StepForward ? currentStep : currentStep + 1
+      ].state_id
+    );
   }, [currentStep]);
-
-  const handleOpen = () => setOpenSettingsModal(true);
-  const handleClose = () => setOpenSettingsModal(false);
-  const handlePlaySpeedChange = (event) => setPlaySpeed(event.target.value);
-  const handleColorChoiceChange = (event) => setColorChoice(event.target.value);
 
   return (
     <>
@@ -105,6 +103,71 @@ const ViewerGraph: React.FC<ViewerGraphProps> = (props) => {
         graphData={{
           nodes: graphData.nodes,
           links: graphData.links,
+        }}
+        linkCanvasObject={(link, ctx) => {
+          const isPath =
+            (link.source.state_type === "StateStatus.Path" ||
+              link.source.state_type === "START" ||
+              link.source.state_type === "StateStatus.Solution") &&
+            (link.target.state_type === "StateStatus.Path" ||
+              link.target.state_type === "StateStatus.Solution" ||
+              link.target.state_type === "START");
+          const isClicked =
+            link.source.id === props.selectedStateId ||
+            link.target.id === props.selectedStateId;
+          const linkThickness = isClicked ? 2 : 1; // Adjust the link thickness as desired
+
+          // Render the link
+          ctx.beginPath();
+          ctx.moveTo(link.source.x, link.source.y);
+          ctx.lineTo(link.target.x, link.target.y);
+          ctx.strokeStyle = "#dddddd";
+          ctx.strokeStyle = isPath ? "#ff0000" : ctx.strokeStyle;
+          ctx.strokeStyle = isClicked ? "#f030d2" : ctx.strokeStyle;
+          ctx.lineWidth = linkThickness;
+          ctx.stroke();
+        }}
+        nodeCanvasObject={(node, ctx, globalScale) => {
+          const isClicked = node.id === props.selectedStateId; // Assuming you have a "clickedNodeId" state variable
+
+          let nodeShape = "circle";
+
+          switch (node.state_type) {
+            case "START":
+              nodeShape = "square";
+              break;
+            case "SOLUTION":
+              nodeShape = "square";
+              break;
+            default:
+              nodeShape = "circle";
+              break;
+          }
+
+          const nodeSize = 12;
+          const nodeRadius = nodeSize / 2;
+
+          // Render the node
+          ctx.fillStyle = node.node_color || "#000000";
+          if (isClicked) {
+            ctx.fillStyle = "#ff0000";
+          }
+          ctx.beginPath();
+          if (nodeShape === "square") {
+            ctx.rect(
+              node.x - nodeRadius,
+              node.y - nodeRadius,
+              nodeSize,
+              nodeSize
+            );
+          } else {
+            ctx.arc(node.x, node.y, nodeRadius, 0, 2 * Math.PI, false);
+          }
+          ctx.fill();
+          ctx.closePath();
+        }}
+        nodeLabel={(node) => {
+          return node.id || "Empty";
         }}
         nodeColor={(node) => {
           return node.node_color || "#000000";
@@ -117,76 +180,23 @@ const ViewerGraph: React.FC<ViewerGraphProps> = (props) => {
         width={props.size.width || undefined}
         height={props.size.height || undefined}
         enableNodeDrag={false}
-        linkWidth={1}
-        nodeRelSize={5}
-        linkColor={() => "#dddddd"}
-      />
-      <Box
-        sx={{
-          zIndex: 1,
-          position: "absolute",
-          top: "0",
-          left: "50%",
-          transform: "translate(-50%, -2px)",
+        // linkWidth={2}
+        nodeRelSize={7}
+        linkColor={(link) => {
+          return link.link_color || "#dddddd";
         }}
-      >
-        <ButtonGroup variant="contained">
-          <Button onClick={reset}>
-            <FaRedo />
-          </Button>
-          <Button onClick={play}>
-            <FaPlay />
-          </Button>
-          <Button onClick={pause}>
-            <FaPause />
-          </Button>
-          <Button onClick={next}>
-            <FaStepForward />
-          </Button>
-          <Button onClick={previous}>
-            <FaStepBackward />
-          </Button>
-          <Button onClick={handleOpen}>
-            <FaCog />
-          </Button>
-        </ButtonGroup>
-
-        <Dialog open={openSettingsModal} onClose={handleClose}>
-          <DialogTitle>Graph Settings</DialogTitle>
-          <DialogContent sx={{ width: "350px" }}>
-            <FormControl fullWidth margin="normal">
-              <InputLabel id="play-speed-label">Play Speed</InputLabel>
-              <Select
-                labelId="play-speed-label"
-                id="play-speed"
-                value={playSpeed}
-                label="Play Speed"
-                onChange={handlePlaySpeedChange}
-              >
-                <MenuItem value={0.1}>0.1</MenuItem>
-                <MenuItem value={0.25}>0.25</MenuItem>
-                <MenuItem value={0.5}>0.5</MenuItem>
-                <MenuItem value={1}>1</MenuItem>
-                <MenuItem value={2}>2</MenuItem>
-                <MenuItem value={5}>5</MenuItem>
-              </Select>
-            </FormControl>
-            <FormControl fullWidth margin="normal">
-              <InputLabel id="color-choice-label">Color Choice</InputLabel>
-              <Select
-                labelId="color-choice-label"
-                id="color-choice"
-                value={colorChoice}
-                label="Color Choice"
-                onChange={handleColorChoiceChange}
-              >
-                <MenuItem value="STATE_TYPE">State Type</MenuItem>
-                <MenuItem value="DEPTH">Depth</MenuItem>
-              </Select>
-            </FormControl>
-          </DialogContent>
-        </Dialog>
-      </Box>
+      />
+      <TopControl
+        onReset={reset}
+        onPlay={play}
+        onPause={pause}
+        onNextStep={next}
+        onPreviousStep={previous}
+        onColorChoiceChange={setColorChoice}
+        onPlaySpeedChange={setPlaySpeed}
+        playSpeed={playSpeed}
+        colorChoice={colorChoice}
+      />
     </>
   );
 };

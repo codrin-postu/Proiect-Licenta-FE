@@ -1,7 +1,6 @@
 import axios from "axios";
 import { convertValuesToInt } from "../common/functions";
-
-const BASE_URL = "http://localhost:8000/api";
+import { BASE_URL } from "../common/constants";
 
 const getProblems = async () => {
   try {
